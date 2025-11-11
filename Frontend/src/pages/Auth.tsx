@@ -56,7 +56,7 @@ export default function Auth() {
         description: `Signed in as ${response.user.fullName}`,
       });
 
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       let message = "We could not sign you in. Please check your credentials and try again.";
 
@@ -90,7 +90,7 @@ export default function Auth() {
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-500">
             <Shield className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">FraudGuard</h1>
+          <h1 className="text-2xl font-bold">FirstGuard</h1>
         </div>
 
         <div className="space-y-6">
@@ -103,7 +103,7 @@ export default function Auth() {
         </div>
 
         <div className="text-sm text-primary-foreground/60">
-          © 2025 FraudGuard. All rights reserved.
+          © 2025 FirstGuard. All rights reserved.
         </div>
       </div>
 
@@ -216,7 +216,7 @@ export default function Auth() {
           </form>
 
           <div className="text-center text-xs text-muted-foreground">
-            © 2025 FraudGuard. All rights reserved.{" "}
+            © 2025 FirstGuard. All rights reserved.{" "}
             <a href="#" className="text-primary hover:underline">Terms of Service</a> &{" "}
             <a href="#" className="text-primary hover:underline">Privacy Policy</a>
           </div>
