@@ -20,7 +20,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Search, Plus, Calendar as CalendarIcon, Filter, Loader2, Trash2, MessageSquare, History, Send, X, Check, ChevronsUpDown } from "lucide-react";
+import { Search, Plus, Calendar as CalendarIcon, Loader2, Trash2, MessageSquare, History, Send, X, Check, ChevronsUpDown } from "lucide-react";
 import { casesApi, Case, transactionsApi, Transaction, commentsApi, auditLogsApi, Comment, usersApi, User } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -209,15 +209,6 @@ export default function Cases() {
       return [];
     }
   })();
-
-  // Handle apply filters
-  const handleApplyFilters = () => {
-    // Filters are already applied via useMemo, this is just for UI feedback
-    toast({
-      title: "Filters Applied",
-      description: "Case list has been filtered based on your criteria.",
-    });
-  };
 
   // Filter transactions for autocomplete
   const filteredTransactionsForAutocomplete = useMemo(() => {
@@ -582,14 +573,6 @@ export default function Cases() {
                 )}
               </PopoverContent>
             </Popover>
-            <Button 
-              variant="default" 
-              className="bg-primary"
-              onClick={handleApplyFilters}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Apply Filters
-            </Button>
             {(searchQuery || statusFilter !== "all" || assigneeFilter !== "all-assignees" || dateRange) && (
               <Button 
                 variant="outline" 
@@ -631,7 +614,7 @@ export default function Cases() {
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">{caseItem.id.substring(0, 8)}...</span>
                             <div className="flex items-center gap-2">
-                              <Badge variant="destructive">High</Badge>
+                              <Badge variant="secondary" className="bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-100">New</Badge>
                               {isAdmin && (
                                 <Button
                                   variant="ghost"
@@ -759,7 +742,7 @@ export default function Cases() {
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">{caseItem.id.substring(0, 8)}...</span>
                             <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="bg-success text-white hover:bg-success">
+                              <Badge variant="secondary" className="bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700">
                                 Resolved
                               </Badge>
                               {isAdmin && (

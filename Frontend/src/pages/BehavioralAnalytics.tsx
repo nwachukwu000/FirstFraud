@@ -154,154 +154,16 @@ export default function BehavioralAnalytics() {
             <h1 className="text-3xl font-bold tracking-tight">Behavioral & Device Analytics</h1>
             <p className="text-muted-foreground">Visualize and configure analytics for user behavior, devices, and more.</p>
           </div>
-          <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            Configure Checks
-          </Button>
         </div>
 
         <Tabs defaultValue="behavioral" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="behavioral">Behavioral</TabsTrigger>
+            
             <TabsTrigger value="device">Device Fingerprinting</TabsTrigger>
             <TabsTrigger value="geolocation">Geolocation</TabsTrigger>
-            <TabsTrigger value="velocity">Velocity Checks</TabsTrigger>
+           
           </TabsList>
 
-          <TabsContent value="behavioral" className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>User Behavior Deviations</CardTitle>
-                  <CardDescription>Transaction patterns over time</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-4 flex gap-2">
-                    <Button
-                      variant={timeRange === "24h" ? "default" : "outline"}
-                      size="sm"
-                      className={timeRange === "24h" ? "rounded-full bg-primary" : "rounded-full"}
-                      onClick={() => setTimeRange("24h")}
-                    >
-                      24h
-                    </Button>
-                    <Button
-                      variant={timeRange === "7d" ? "default" : "outline"}
-                      size="sm"
-                      className={timeRange === "7d" ? "rounded-full bg-primary" : "rounded-full"}
-                      onClick={() => setTimeRange("7d")}
-                    >
-                      7d
-                    </Button>
-                    <Button
-                      variant={timeRange === "30d" ? "default" : "outline"}
-                      size="sm"
-                      className={timeRange === "30d" ? "rounded-full bg-primary" : "rounded-full"}
-                      onClick={() => setTimeRange("30d")}
-                    >
-                      30d
-                    </Button>
-                  </div>
-                  {transactionsLoading ? (
-                    <div className="flex h-[300px] items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : timeRange === "24h" && hourlyData.length > 0 ? (
-                    <div className="h-[300px] w-full">
-                      <svg viewBox="0 0 800 300" className="h-full w-full">
-                        {hourlyData.map((data, index) => {
-                          const xPos = 40 + (index * (720 / Math.max(hourlyData.length - 1, 1)));
-                          const barHeight = maxCount > 0 ? (data.count / maxCount) * 240 : 0;
-                          const highRiskHeight = data.count > 0 ? (data.highRisk / data.count) * barHeight : 0;
-                          const yPos = 260 - barHeight;
-                          const highRiskYPos = 260 - highRiskHeight;
-                          
-                          return (
-                            <g key={index}>
-                              <text
-                                x={xPos + 15}
-                                y={290}
-                                className="text-xs fill-muted-foreground"
-                              >
-                                {data.hour}
-                              </text>
-                              <rect
-                                x={xPos}
-                                y={yPos}
-                                width="30"
-                                height={barHeight}
-                                className="fill-primary"
-                                rx="2"
-                              />
-                              {highRiskHeight > 0 && (
-                                <rect
-                                  x={xPos}
-                                  y={highRiskYPos}
-                                  width="30"
-                                  height={highRiskHeight}
-                                  className="fill-destructive"
-                                  rx="2"
-                                />
-                              )}
-                            </g>
-                          );
-                        })}
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="flex h-[300px] items-center justify-center text-muted-foreground">
-                      {timeRange === "24h" ? "No data available for the last 24 hours" : "Hourly view only available for 24h range"}
-                    </div>
-                  )}
-                  <div className="mt-4 flex items-center justify-center gap-4 text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-sm bg-primary" />
-                      <span>Total Transactions</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-sm bg-destructive" />
-                      <span>High Risk</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sensitivity Configuration</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label>Deviation Threshold</Label>
-                    <Select value={deviationThreshold} onValueChange={setDeviationThreshold}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Flag New Payee</Label>
-                      <p className="text-xs text-muted-foreground">
-                        Alert on first-time recipients
-                      </p>
-                    </div>
-                    <Switch checked={flagNewPayee} onCheckedChange={setFlagNewPayee} />
-                  </div>
-
-                  <Button className="w-full bg-yellow-500 text-white hover:bg-yellow-600" onClick={handleUpdateSettings}>
-                    Update Settings
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
 
           <TabsContent value="device">
             <div className="grid gap-6 md:grid-cols-2">
@@ -433,62 +295,7 @@ export default function BehavioralAnalytics() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="velocity">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
-                  Velocity Checks
-                </CardTitle>
-                <CardDescription>Monitor transaction frequency and detect rapid succession patterns</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {transactionsLoading ? (
-                  <div className="flex h-[400px] items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </div>
-                ) : velocityData.length > 0 ? (
-                  <div className="space-y-4">
-                    <div className="rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-4">
-                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>High Velocity Alert:</strong> The following accounts show unusual transaction frequency patterns that may indicate fraudulent activity.
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      {velocityData.map((item, index) => (
-                        <div key={index} className="rounded-lg border p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold">Account: {item.account}</span>
-                            <span className="text-sm font-medium text-destructive">
-                              {item.transactionsPerHour.toFixed(2)} tx/hour
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Total Transactions</span>
-                              <p className="font-semibold">{item.count}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Total Amount</span>
-                              <p className="font-semibold">₦{item.totalAmount.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Status</span>
-                              <p className="font-semibold text-destructive">High Velocity</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No high-velocity patterns detected
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+          
         </Tabs>
       </div>
     </AppLayout>

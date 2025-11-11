@@ -219,10 +219,7 @@ export default function CustomReports() {
             <h1 className="text-3xl font-bold tracking-tight">Custom Reports</h1>
             <p className="text-muted-foreground">Generate, view, and export custom reports</p>
           </div>
-          <Button className="bg-primary" variant="outline">
-            <Calendar className="mr-2 h-4 w-4" />
-            Schedule Report
-          </Button>
+         
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">

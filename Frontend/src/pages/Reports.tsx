@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import CountUp from "react-countup";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -178,10 +179,6 @@ export default function Reports() {
                 <SelectItem value="all">All Time</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-primary">
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
           </div>
         </div>
 
@@ -198,7 +195,9 @@ export default function Reports() {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{totalAlerts.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    <CountUp end={totalAlerts} duration={1.5} separator="," />
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {timeRange === "6m" ? "Last 6 months" : timeRange === "1y" ? "Last year" : "All time"}
                   </p>
@@ -211,9 +210,11 @@ export default function Reports() {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{resolutionRate}%</div>
+                  <div className="text-2xl font-bold">
+                    <CountUp end={parseFloat(resolutionRate)} decimals={1} duration={1.5} />%
+                  </div>
                   <p className="text-xs text-success">
-                    {resolvedCases.length} of {cases.length} cases resolved
+                    <CountUp end={resolvedCases.length} duration={1.5} /> of <CountUp end={cases.length} duration={1.5} /> cases resolved
                   </p>
                 </CardContent>
               </Card>
@@ -224,9 +225,11 @@ export default function Reports() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{avgResolutionTime} days</div>
+                  <div className="text-2xl font-bold">
+                    <CountUp end={parseFloat(avgResolutionTime)} decimals={1} duration={1.5} /> days
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Based on {resolvedCasesWithTime.length} resolved cases
+                    Based on <CountUp end={resolvedCasesWithTime.length} duration={1.5} /> resolved cases
                   </p>
                 </CardContent>
               </Card>
@@ -237,7 +240,9 @@ export default function Reports() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{highRiskAccountsCount}</div>
+                  <div className="text-2xl font-bold">
+                    <CountUp end={highRiskAccountsCount} duration={1.5} />
+                  </div>
                   <p className="text-xs text-destructive">Requiring attention</p>
                 </CardContent>
               </Card>

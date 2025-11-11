@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { Shield, LayoutDashboard, CreditCard, AlertTriangle, FolderKanban, BarChart3, FileText, Activity, Settings, Users, User as UserIcon, LogOut } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { User as UserType, alertsApi, casesApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
+import { motionConfig } from "@/lib/motionConfig";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +34,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Get logged-in user from localStorage
   const currentUser = useMemo(() => {
@@ -98,34 +101,49 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === "/"}
-                      className={({ isActive }) =>
-                        `flex items-center gap-2 ${
+              {menuItems.map((item) => {
+                const isActive = item.url === "/" 
+                  ? location.pathname === "/"
+                  : location.pathname.startsWith(item.url);
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        end={item.url === "/"}
+                        className={`relative flex items-center gap-2 transition-colors ${
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold border-l-4 border-blue-600 dark:border-blue-400"
                             : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                        }`
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span className="flex-1">{item.title}</span>
-                      {item.title === "Alerts" && alertsWithoutCaseCount > 0 && (
-                        <Badge 
-                          variant="destructive" 
-                          className="h-5 min-w-5 px-1.5 text-xs"
+                        }`}
+                      >
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          transition={motionConfig.hoverTransition}
+                          className={isActive ? "text-blue-700 dark:text-blue-300" : ""}
                         >
-                          {alertsWithoutCaseCount > 99 ? "99+" : alertsWithoutCaseCount}
-                        </Badge>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                          <item.icon className="h-4 w-4" />
+                        </motion.div>
+                        <span className="flex-1">{item.title}</span>
+                        {item.title === "Alerts" && alertsWithoutCaseCount > 0 && (
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <Badge 
+                              variant="destructive" 
+                              className="h-5 min-w-5 px-1.5 text-xs animate-pulse"
+                            >
+                              {alertsWithoutCaseCount > 99 ? "99+" : alertsWithoutCaseCount}
+                            </Badge>
+                          </motion.div>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -153,13 +171,13 @@ export function AppSidebar() {
             <SidebarMenuButton asChild>
               <NavLink 
                 to="/profile-settings"
-                className={({ isActive }) =>
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                className={`relative flex items-center gap-2 transition-colors ${
+                  location.pathname === "/profile-settings"
+                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold border-l-4 border-blue-600 dark:border-blue-400"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                }
+                }`}
               >
-                <UserIcon className="h-4 w-4" />
+                <UserIcon className={`h-4 w-4 ${location.pathname === "/profile-settings" ? "text-blue-700 dark:text-blue-300" : ""}`} />
                 <span>Profile & Settings</span>
               </NavLink>
             </SidebarMenuButton>
