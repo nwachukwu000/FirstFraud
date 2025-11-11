@@ -10,3 +10,4 @@ Debug/
 Release/
 
 .fake
+Backend/src/WebApi/appsettings.json
