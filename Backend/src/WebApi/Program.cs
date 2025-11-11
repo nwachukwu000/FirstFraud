@@ -8,8 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System.Text;
+using NLog.Web;
+using FDMA.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// NLog: configure logging
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 // Add services
 builder.Services.AddEndpointsApiExplorer();
@@ -105,6 +111,9 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+// Global error handling
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 // Ensure database exists and auto-migrate
 using (var scope = app.Services.CreateScope())
 {
@@ -157,14 +166,9 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     db.Database.Migrate();
-    await FDMA.Infrastructure.Persistence.DbSeeder.SeedAsync(db, userManager, roleManager);
+    await FDMA.Infrastructure.Persistence.DbSeeder.SeedAsync(db, userManager, roleManager, builder.Configuration);
 }
 
-//if (app.Environment.IsDevelopment())
-//{
-    // app.UseSwagger();
-    // app.UseSwaggerUI();
-//}
 app.UseSwagger();
 app.UseSwaggerUI();
 

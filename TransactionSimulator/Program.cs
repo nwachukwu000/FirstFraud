@@ -191,7 +191,8 @@ class Program
 
         var random = new Random();
         var transactionTypes = new[] { "Transfer", "Withdrawal", "Deposit", "Payment" };
-        var devices = new[] { "iOS", "Android", "Web", "NewDevice", "MobileApp" };
+        var devices = new[] { "iOS
+        ", "Android", "Web", "NewDevice", "MobileApp" };
         var locations = new[] { "NG-LAGOS", "NG-ABUJA", "NG-KANO", "NG-PORT-HARCOURT", "US-NEW-YORK", "UK-LONDON" };
 
         int successCount = 0;

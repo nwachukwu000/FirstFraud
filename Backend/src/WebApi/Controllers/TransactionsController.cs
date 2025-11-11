@@ -22,6 +22,7 @@ public class TransactionsController : BaseController
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] int page = 1, [FromQuery] int pageSize = 20,
         [FromQuery] string? status = null, [FromQuery] string? account = null, [FromQuery] string? type = null,
         [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null, [FromQuery] int? minRisk = null)
@@ -31,6 +32,8 @@ public class TransactionsController : BaseController
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(TransactionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var t = await _service.GetByIdAsync(id);
@@ -38,6 +41,8 @@ public class TransactionsController : BaseController
     }
 
     [HttpGet("{id:guid}/details")]
+    [ProducesResponseType(typeof(TransactionDetailsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDetails(Guid id)
     {
         var details = await _service.GetDetailsByIdAsync(id);
@@ -45,11 +50,16 @@ public class TransactionsController : BaseController
     }
 
     [HttpGet("account/{accountNumber}")]
+    [ProducesResponseType(typeof(IEnumerable<TransactionResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByAccount(string accountNumber)
         => Ok((await _service.GetByAccountAsync(accountNumber)).Select(TransactionResponse.FromEntity));
 
     [HttpPost]
     [Authorize(Roles = "Admin,Analyst")]
+    [ProducesResponseType(typeof(TransactionResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Create([FromBody] TransactionRequest req)
     {
         var t = new Transaction
@@ -75,6 +85,9 @@ public class TransactionsController : BaseController
     }
 
     [HttpPut("{id:guid}/flag")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Flag(Guid id, [FromQuery] bool isFlagged = true)
     {
         await _service.FlagAsync(id, isFlagged);
