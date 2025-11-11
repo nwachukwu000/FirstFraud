@@ -56,7 +56,7 @@ export default function Auth() {
         description: `Signed in as ${response.user.fullName}`,
       });
 
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       let message = "We could not sign you in. Please check your credentials and try again.";
 
