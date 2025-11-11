@@ -11,8 +11,8 @@ import { authApi } from "@/lib/api";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("admin@fraudguard.com");
-  const [password, setPassword] = useState("anytext");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
