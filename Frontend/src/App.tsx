@@ -26,7 +26,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Auth />} />
+          <Route path="/dashhboard" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/transactions/:id" element={<TransactionDetails />} />
           <Route path="/alerts" element={<Alerts />} />
@@ -37,7 +38,6 @@ const App = () => (
           <Route path="/rules-engine" element={<RulesEngine />} />
           <Route path="/user-management" element={<UserManagement />} />
           <Route path="/profile-settings" element={<ProfileSettings />} />
-          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
