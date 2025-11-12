@@ -1,8 +1,10 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import Alerts from './pages/Alerts';
 import Auth from './pages/Auth';
 import BehavioralAnalytics from './pages/BehavioralAnalytics';
@@ -26,9 +28,21 @@ const App = () => (
 			<Sonner />
 			<BrowserRouter>
 				<Routes>
+					{/* Public routes */}
+					<Route
+						path='/auth'
+						element={<Auth />}
+					/>
+
+					{/* Protected routes - All authenticated users */}
 					<Route
 						path='/'
-						element={<Dashboard />}
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
+								<Dashboard />
+							</ProtectedRoute>
+						}
 					/>
 					<Route
 						path='/dashboard'
@@ -40,49 +54,103 @@ const App = () => (
 						}
 					/>
 					<Route
-						path='/auth'
-						element={<Auth />}
-					/>
-					<Route
 						path='/transactions'
-						element={<Transactions />}
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
+								<Transactions />
+							</ProtectedRoute>
+						}
 					/>
 					<Route
 						path='/transactions/:id'
-						element={<TransactionDetails />}
-					/>
-					<Route
-						path='/alerts'
-						element={<Alerts />}
-					/>
-					<Route
-						path='/cases'
-						element={<Cases />}
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
+								<TransactionDetails />
+							</ProtectedRoute>
+						}
 					/>
 					<Route
 						path='/reports'
-						element={<Reports />}
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
+								<Reports />
+							</ProtectedRoute>
+						}
 					/>
+
+					{/* Protected routes - Admin, Analyst, Investigator, Viewer */}
+					<Route
+						path='/alerts'
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Investigator', 'Viewer']}>
+								<Alerts />
+							</ProtectedRoute>
+						}
+					/>
+
+					{/* Protected routes - Admin, Analyst, Investigator */}
+					<Route
+						path='/cases'
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator']}>
+								<Cases />
+							</ProtectedRoute>
+						}
+					/>
+
+					{/* Protected routes - Admin, Analyst */}
 					<Route
 						path='/custom-reports'
-						element={<CustomReports />}
+						element={
+							<ProtectedRoute allowedRoles={['Admin', 'Analyst']}>
+								<CustomReports />
+							</ProtectedRoute>
+						}
 					/>
 					<Route
 						path='/behavioral-analytics'
-						element={<BehavioralAnalytics />}
+						element={
+							<ProtectedRoute allowedRoles={['Admin', 'Analyst']}>
+								<BehavioralAnalytics />
+							</ProtectedRoute>
+						}
 					/>
+
+					{/* Protected routes - Admin only */}
 					<Route
 						path='/rules-engine'
-						element={<RulesEngine />}
+						element={
+							<ProtectedRoute allowedRoles={['Admin']}>
+								<RulesEngine />
+							</ProtectedRoute>
+						}
 					/>
 					<Route
 						path='/user-management'
-						element={<UserManagement />}
+						element={
+							<ProtectedRoute allowedRoles={['Admin']}>
+								<UserManagement />
+							</ProtectedRoute>
+						}
 					/>
+
+					{/* Profile settings - All authenticated users */}
 					<Route
 						path='/profile-settings'
-						element={<ProfileSettings />}
+						element={
+							<ProtectedRoute
+								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
+								<ProfileSettings />
+							</ProtectedRoute>
+						}
 					/>
+
+					{/* 404 */}
 					<Route
 						path='*'
 						element={<NotFound />}
