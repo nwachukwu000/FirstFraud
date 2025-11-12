@@ -16,6 +16,7 @@ import UserManagement from "./pages/UserManagement";
 import ProfileSettings from "./pages/ProfileSettings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -26,19 +27,111 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Navigate to="/" replace />} />
+          {/* Public routes */}
           <Route path="/auth" element={<Auth />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/transactions/:id" element={<TransactionDetails />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/cases" element={<Cases />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/custom-reports" element={<CustomReports />} />
-          <Route path="/behavioral-analytics" element={<BehavioralAnalytics />} />
-          <Route path="/rules-engine" element={<RulesEngine />} />
-          <Route path="/user-management" element={<UserManagement />} />
-          <Route path="/profile-settings" element={<ProfileSettings />} />
+          
+          {/* Protected routes - All authenticated users */}
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator", "Viewer"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/dashboard" element={<Navigate to="/" replace />} />
+          <Route 
+            path="/transactions" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator", "Viewer"]}>
+                <Transactions />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/transactions/:id" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator", "Viewer"]}>
+                <TransactionDetails />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/reports" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator", "Viewer"]}>
+                <Reports />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected routes - Admin, Analyst, Investigator, Viewer */}
+          <Route 
+            path="/alerts" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Investigator", "Viewer"]}>
+                <Alerts />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected routes - Admin, Analyst, Investigator */}
+          <Route 
+            path="/cases" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator"]}>
+                <Cases />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected routes - Admin, Analyst */}
+          <Route 
+            path="/custom-reports" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst"]}>
+                <CustomReports />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/behavioral-analytics" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst"]}>
+                <BehavioralAnalytics />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected routes - Admin only */}
+          <Route 
+            path="/rules-engine" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <RulesEngine />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/user-management" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <UserManagement />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Profile settings - All authenticated users */}
+          <Route 
+            path="/profile-settings" 
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "Analyst", "Investigator", "Viewer"]}>
+                <ProfileSettings />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

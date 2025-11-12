@@ -192,14 +192,6 @@ export default function Transactions() {
                     <SelectItem value="low">Low (&lt;50)</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button className="bg-primary">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export Data
-                </Button>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Transaction
-                </Button>
               </div>
             </div>
 

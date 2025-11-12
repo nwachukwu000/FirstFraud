@@ -6,6 +6,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { User as UserType, alertsApi, casesApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { motionConfig } from "@/lib/motionConfig";
+import { getCurrentUserRole, filterMenuItemsByRole, type MenuItem } from "@/lib/permissions";
 import {
   Sidebar,
   SidebarContent,
@@ -20,16 +21,16 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
-const menuItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Transaction Monitoring", url: "/transactions", icon: CreditCard },
-  { title: "Alerts", url: "/alerts", icon: AlertTriangle },
-  { title: "Case Management", url: "/cases", icon: FolderKanban },
-  { title: "Reports & Analytics", url: "/reports", icon: BarChart3 },
-  { title: "Custom Reports", url: "/custom-reports", icon: FileText },
-  { title: "Behavioral Analytics", url: "/behavioral-analytics", icon: Activity },
-  { title: "Rules Engine", url: "/rules-engine", icon: Settings },
-  { title: "User & Role Management", url: "/user-management", icon: Users },
+const menuItems: MenuItem[] = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["Admin", "Analyst", "Investigator", "Viewer"] },
+  { title: "Transaction Monitoring", url: "/transactions", icon: CreditCard, roles: ["Admin", "Analyst", "Investigator", "Viewer"] },
+  { title: "Alerts", url: "/alerts", icon: AlertTriangle, roles: ["Admin", "Investigator", "Viewer"] },
+  { title: "Case Management", url: "/cases", icon: FolderKanban, roles: ["Admin", "Analyst", "Investigator"] },
+  { title: "Reports & Analytics", url: "/reports", icon: BarChart3, roles: ["Admin", "Analyst", "Investigator", "Viewer"] },
+  { title: "Custom Reports", url: "/custom-reports", icon: FileText, roles: ["Admin", "Analyst"] },
+  { title: "Behavioral Analytics", url: "/behavioral-analytics", icon: Activity, roles: ["Admin", "Analyst"] },
+  { title: "Rules Engine", url: "/rules-engine", icon: Settings, roles: ["Admin"] },
+  { title: "User & Role Management", url: "/user-management", icon: Users, roles: ["Admin"] },
 ];
 
 export function AppSidebar() {
@@ -48,6 +49,12 @@ export function AppSidebar() {
     }
     return null;
   }, []);
+
+  // Get user role and filter menu items based on role
+  const userRole = useMemo(() => getCurrentUserRole(), []);
+  const visibleMenuItems = useMemo(() => {
+    return filterMenuItemsByRole(menuItems, userRole);
+  }, [userRole]);
 
   // Get user initials for avatar
   const userInitials = useMemo(() => {
@@ -101,7 +108,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => {
+              {visibleMenuItems.map((item) => {
                 const isActive = item.url === "/" 
                   ? location.pathname === "/"
                   : location.pathname.startsWith(item.url);

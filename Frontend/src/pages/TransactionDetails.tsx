@@ -210,10 +210,6 @@ export default function TransactionDetails() {
               </p>
             </div>
           </div>
-          <Button onClick={handleCreateCase} className="gap-2">
-            <FileText className="h-4 w-4" />
-            Create Case
-          </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
