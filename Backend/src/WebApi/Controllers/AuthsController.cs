@@ -29,6 +29,8 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {
         var user = await _userManager.FindByEmailAsync(req.Email);
@@ -52,6 +54,8 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("register")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest req)
     {
         if (await _userManager.FindByEmailAsync(req.Email) is not null)
@@ -87,6 +91,7 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("confirm-email")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult ConfirmEmail([FromBody] ConfirmEmailRequest req)
     {
         // Mock email confirmation
@@ -94,6 +99,7 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult ForgotPassword([FromBody] ForgotPasswordRequest req)
     {
         // Mock forgot password - would send reset email in production
@@ -101,6 +107,7 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("reset-password")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult ResetPassword([FromBody] ResetPasswordRequest req)
     {
         // Mock password reset
@@ -109,6 +116,8 @@ public class AuthsController : ControllerBase
 
     [HttpPost("create-admin")]
     [AllowAnonymous] // Allow this for initial setup - remove in production or add IP restriction
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAdmin()
     {
         var adminEmail = "admin@fraudguard.com";
@@ -151,6 +160,10 @@ public class AuthsController : ControllerBase
 
     [HttpPost("change-password")]
     [Authorize] // This endpoint requires authentication
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

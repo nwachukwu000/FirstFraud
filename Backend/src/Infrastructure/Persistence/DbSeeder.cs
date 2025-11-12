@@ -1,12 +1,13 @@
 using FDMA.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace FDMA.Infrastructure.Persistence;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext db, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+    public static async Task SeedAsync(AppDbContext db, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, IConfiguration config)
     {
         // Create roles if they don't exist
         var roles = new[] { "Admin", "Analyst", "Viewer" };
@@ -44,7 +45,10 @@ public static class DbSeeder
                 }
             );
         }
-        if (!await db.Transactions.AnyAsync())
+        // Conditionally seed sample transactions
+        var seedSamplesSetting = config["Seed:SampleTransactions"];
+        var seedSamples = bool.TryParse(seedSamplesSetting, out var parsed) && parsed;
+        if (seedSamples && !await db.Transactions.AnyAsync())
         {
             for (int i = 0; i < 20; i++)
             {

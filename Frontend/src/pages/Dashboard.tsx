@@ -1,6 +1,3 @@
-import { AppLayout } from '@/components/AppLayout';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	Select,
@@ -19,8 +16,6 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { alertsApi, casesApi, transactionsApi } from '@/lib/api';
-import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import {
 	AlertTriangle,
 	CheckCircle2,
@@ -29,7 +24,16 @@ import {
 	Loader2,
 	TrendingUp,
 } from 'lucide-react';
+
+import { AppLayout } from '@/components/AppLayout';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { motionConfig } from '@/lib/motionConfig';
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
+import CountUp from 'react-countup';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -109,7 +113,7 @@ export default function Dashboard() {
 	// Resolved cases: Cases with status = Closed (2)
 	const resolvedCases = cases.filter(c => {
 		const status =
-			typeof c.status === 'string' ? parseInt(c.status, 10) : c.status;
+			typeof c.status === 'string' ? Number.parseInt(c.status, 10) : c.status;
 		return status === 2; // Closed/Resolved
 	});
 	const resolvedCasesCount = resolvedCases.length;
@@ -117,7 +121,7 @@ export default function Dashboard() {
 	// Pending cases: Cases with status = Open (0) or UnderInvestigation (1)
 	const pendingCases = cases.filter(c => {
 		const status =
-			typeof c.status === 'string' ? parseInt(c.status, 10) : c.status;
+			typeof c.status === 'string' ? Number.parseInt(c.status, 10) : c.status;
 		return status === 0 || status === 1; // Open or UnderInvestigation
 	});
 	const pendingCasesCount = pendingCases.length;
@@ -137,7 +141,7 @@ export default function Dashboard() {
 			if (caseForTransaction) {
 				const status =
 					typeof caseForTransaction.status === 'string'
-						? parseInt(caseForTransaction.status, 10)
+						? Number.parseInt(caseForTransaction.status, 10)
 						: caseForTransaction.status;
 				return status === 2; // Closed/Resolved
 			}
@@ -186,117 +190,267 @@ export default function Dashboard() {
 					</div>
 
 					<div className='gap-4 grid md:grid-cols-2 lg:grid-cols-4'>
-						<Card>
-							<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
-								<CardTitle className='font-medium text-sm'>
-									Total Transactions
-								</CardTitle>
-								<CreditCard className='w-4 h-4 text-muted-foreground' />
-							</CardHeader>
-							<CardContent>
-								<div className='font-bold text-2xl'>
-									{transactionsLoading ? (
-										<Loader2 className='w-6 h-6 animate-spin' />
-									) : totalAmount >= 1000000 ? (
-										`₦${(totalAmount / 1000000).toFixed(1)}M`
-									) : totalAmount >= 1000 ? (
-										`₦${(totalAmount / 1000).toFixed(1)}K`
-									) : (
-										`₦${totalAmount.toLocaleString()}`
-									)}
-								</div>
-								<p className='text-success text-xs'>
-									<TrendingUp className='inline mr-1 w-3 h-3' />
-									{totalTransactionsCount} transactions
-								</p>
-							</CardContent>
-						</Card>
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ ...motionConfig.cardTransition, delay: 0.1 }}>
+							<Card>
+								<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
+									<CardTitle className='font-medium text-sm'>
+										Total Transactions
+									</CardTitle>
+									<CreditCard className='w-4 h-4 text-muted-foreground' />
+								</CardHeader>
+								<CardContent>
+									<div className='font-bold text-2xl'>
+										{(() => {
+											if (transactionsLoading) {
+												return <Loader2 className='w-6 h-6 animate-spin' />;
+											}
+											if (totalAmount >= 1000000) {
+												return (
+													<>
+														₦
+														<CountUp
+															end={totalAmount / 1000000}
+															decimals={1}
+															duration={1.5}
+														/>
+														M
+													</>
+												);
+											} else if (totalAmount >= 1000) {
+												return (
+													<>
+														₦
+														<CountUp
+															end={totalAmount / 1000}
+															decimals={1}
+															duration={1.5}
+														/>
+														K
+													</>
+												);
+											} else {
+												return (
+													<>
+														₦
+														<CountUp
+															end={totalAmount}
+															duration={1.5}
+															separator=','
+														/>
+													</>
+												);
+											}
+										})()}
+										`
+									</div>
+									<p className='text-success text-xs'>
+										<TrendingUp className='inline mr-1 w-3 h-3' />
+										<CountUp
+											end={totalTransactionsCount}
+											duration={1.5}
+										/>{' '}
+										transactions
+									</p>
+								</CardContent>
+							</Card>
+						</motion.div>
 
-						<Card>
-							<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
-								<CardTitle className='font-medium text-sm'>
-									Flagged Alerts
-								</CardTitle>
-								<AlertTriangle className='w-4 h-4 text-muted-foreground' />
-							</CardHeader>
-							<CardContent>
-								<div className='font-bold text-2xl'>
-									{alertsLoading ? (
-										<Loader2 className='w-6 h-6 animate-spin' />
-									) : (
-										flaggedAlertsCount
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ ...motionConfig.cardTransition, delay: 0.2 }}>
+							<Card>
+								<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
+									<CardTitle className='font-medium text-sm'>
+										Flagged Alerts
+									</CardTitle>
+									<AlertTriangle className='w-4 h-4 text-muted-foreground' />
+								</CardHeader>
+								<CardContent>
+									<div className='font-bold text-2xl'>
+										{alertsLoading ? (
+											<Loader2 className='w-6 h-6 animate-spin' />
+										) : (
+											<CountUp
+												end={flaggedAlertsCount}
+												duration={1.5}
+											/>
+										)}
+									</div>
+									<p className='text-destructive text-xs'>
+										{totalTransactionsCount > 0 ? (
+											<>
+												<CountUp
+													end={
+														(flaggedAlertsCount / totalTransactionsCount) * 100
+													}
+													decimals={1}
+													duration={1.5}
+												/>
+												% of transactions
+											</>
+										) : (
+											'No transactions'
+										)}
+									</p>
+									{totalTransactionsCount > 0 && (
+										<motion.div
+											className='bg-muted mt-2 rounded-full h-1 overflow-hidden'
+											initial={{ width: 0 }}
+											animate={{ width: '100%' }}
+											transition={{ duration: 1.5, delay: 0.5 }}>
+											<motion.div
+												className='bg-destructive h-full'
+												initial={{ width: 0 }}
+												animate={{
+													width: `${
+														(flaggedAlertsCount / totalTransactionsCount) * 100
+													}%`,
+												}}
+												transition={{ duration: 1.5, delay: 0.5 }}
+											/>
+										</motion.div>
 									)}
-								</div>
-								<p className='text-destructive text-xs'>
-									{totalTransactionsCount > 0
-										? `${(
-												(flaggedAlertsCount / totalTransactionsCount) *
-												100
-										  ).toFixed(1)}% of transactions`
-										: 'No transactions'}
-								</p>
-							</CardContent>
-						</Card>
+								</CardContent>
+							</Card>
+						</motion.div>
 
-						<Card>
-							<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
-								<CardTitle className='font-medium text-sm'>
-									Resolved Cases
-								</CardTitle>
-								<CheckCircle2 className='w-4 h-4 text-muted-foreground' />
-							</CardHeader>
-							<CardContent>
-								<div className='font-bold text-2xl'>
-									{alertsLoading ? (
-										<Loader2 className='w-6 h-6 animate-spin' />
-									) : (
-										resolvedCasesCount
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ ...motionConfig.cardTransition, delay: 0.3 }}>
+							<Card>
+								<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
+									<CardTitle className='font-medium text-sm'>
+										Resolved Cases
+									</CardTitle>
+									<CheckCircle2 className='w-4 h-4 text-muted-foreground' />
+								</CardHeader>
+								<CardContent>
+									<div className='font-bold text-2xl'>
+										{alertsLoading ? (
+											<Loader2 className='w-6 h-6 animate-spin' />
+										) : (
+											<CountUp
+												end={resolvedCasesCount}
+												duration={1.5}
+											/>
+										)}
+									</div>
+									<p className='text-success text-xs'>
+										{totalCasesCount > 0 ? (
+											<>
+												<CountUp
+													end={(resolvedCasesCount / totalCasesCount) * 100}
+													decimals={1}
+													duration={1.5}
+												/>
+												% of cases
+											</>
+										) : flaggedAlertsCount > 0 ? (
+											<>
+												<CountUp
+													end={(resolvedCasesCount / flaggedAlertsCount) * 100}
+													decimals={1}
+													duration={1.5}
+												/>
+												% of flagged alerts
+											</>
+										) : (
+											'No cases'
+										)}
+									</p>
+									{totalCasesCount > 0 && (
+										<motion.div
+											className='bg-muted mt-2 rounded-full h-1 overflow-hidden'
+											initial={{ width: 0 }}
+											animate={{ width: '100%' }}
+											transition={{ duration: 1.5, delay: 0.6 }}>
+											<motion.div
+												className='bg-success h-full'
+												initial={{ width: 0 }}
+												animate={{
+													width: `${
+														(resolvedCasesCount / totalCasesCount) * 100
+													}%`,
+												}}
+												transition={{ duration: 1.5, delay: 0.6 }}
+											/>
+										</motion.div>
 									)}
-								</div>
-								<p className='text-success text-xs'>
-									{totalCasesCount > 0
-										? `${((resolvedCasesCount / totalCasesCount) * 100).toFixed(
-												1
-										  )}% of cases`
-										: flaggedAlertsCount > 0
-										? `${(
-												(resolvedCasesCount / flaggedAlertsCount) *
-												100
-										  ).toFixed(1)}% of flagged alerts`
-										: 'No cases'}
-								</p>
-							</CardContent>
-						</Card>
+								</CardContent>
+							</Card>
+						</motion.div>
 
-						<Card>
-							<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
-								<CardTitle className='font-medium text-sm'>
-									Pending Cases
-								</CardTitle>
-								<Clock className='w-4 h-4 text-muted-foreground' />
-							</CardHeader>
-							<CardContent>
-								<div className='font-bold text-2xl'>
-									{alertsLoading ? (
-										<Loader2 className='w-6 h-6 animate-spin' />
-									) : (
-										pendingCasesCount
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ ...motionConfig.cardTransition, delay: 0.4 }}>
+							<Card>
+								<CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
+									<CardTitle className='font-medium text-sm'>
+										Pending Cases
+									</CardTitle>
+									<Clock className='w-4 h-4 text-muted-foreground' />
+								</CardHeader>
+								<CardContent>
+									<div className='font-bold text-2xl'>
+										{alertsLoading ? (
+											<Loader2 className='w-6 h-6 animate-spin' />
+										) : (
+											<CountUp
+												end={pendingCasesCount}
+												duration={1.5}
+											/>
+										)}
+									</div>
+									<p className='text-yellow-600 text-xs'>
+										{totalCasesCount > 0 ? (
+											<>
+												<CountUp
+													end={(pendingCasesCount / totalCasesCount) * 100}
+													decimals={1}
+													duration={1.5}
+												/>
+												% of cases
+											</>
+										) : flaggedAlertsCount > 0 ? (
+											<>
+												<CountUp
+													end={(pendingCasesCount / flaggedAlertsCount) * 100}
+													decimals={1}
+													duration={1.5}
+												/>
+												% of flagged alerts
+											</>
+										) : (
+											'No cases'
+										)}
+									</p>
+									{totalCasesCount > 0 && (
+										<motion.div
+											className='bg-muted mt-2 rounded-full h-1 overflow-hidden'
+											initial={{ width: 0 }}
+											animate={{ width: '100%' }}
+											transition={{ duration: 1.5, delay: 0.7 }}>
+											<motion.div
+												className='bg-yellow-600 h-full'
+												initial={{ width: 0 }}
+												animate={{
+													width: `${
+														(pendingCasesCount / totalCasesCount) * 100
+													}%`,
+												}}
+												transition={{ duration: 1.5, delay: 0.7 }}
+											/>
+										</motion.div>
 									)}
-								</div>
-								<p className='text-yellow-600 text-xs'>
-									{totalCasesCount > 0
-										? `${((pendingCasesCount / totalCasesCount) * 100).toFixed(
-												1
-										  )}% of cases`
-										: flaggedAlertsCount > 0
-										? `${(
-												(pendingCasesCount / flaggedAlertsCount) *
-												100
-										  ).toFixed(1)}% of flagged alerts`
-										: 'No cases'}
-								</p>
-							</CardContent>
-						</Card>
+								</CardContent>
+							</Card>
+						</motion.div>
 					</div>
 
 					<TabsContent
@@ -336,28 +490,49 @@ export default function Dashboard() {
 												</TableCell>
 											</TableRow>
 										) : (
-											filteredTransactions.map(transaction => {
+											filteredTransactions.map((transaction, index) => {
 												const severity = getSeverityLabel(
 													transaction.riskScore || 0
 												);
+												const isHighSeverity = severity === 'high';
 												return (
-													<TableRow key={transaction.id}>
-														<TableCell className='font-medium'>
+													<motion.tr
+														key={transaction.id}
+														initial={{ opacity: 0, x: -20 }}
+														animate={{ opacity: 1, x: 0 }}
+														transition={{
+															...motionConfig.rowTransition,
+															delay: index * 0.05,
+														}}
+														className={isHighSeverity ? 'relative' : ''}>
+														{isHighSeverity && (
+															<motion.div
+																className='absolute inset-0 bg-red-50 dark:bg-red-950/20'
+																initial={{ opacity: 0 }}
+																animate={{ opacity: [0, 0.3, 0] }}
+																transition={{
+																	duration: 1,
+																	repeat: 1,
+																	delay: index * 0.05 + 0.3,
+																}}
+															/>
+														)}
+														<TableCell className='relative font-medium'>
 															{transaction.id.substring(0, 8)}...
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{transaction.senderAccountNumber}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															₦{transaction.amount.toLocaleString()}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{format(
 																new Date(transaction.createdAt),
 																'MMM dd, yyyy HH:mm'
 															)}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															<Badge
 																variant={
 																	severity === 'high'
@@ -374,18 +549,23 @@ export default function Dashboard() {
 																{severity}
 															</Badge>
 														</TableCell>
-														<TableCell>
-															<Button
-																variant='link'
-																size='sm'
-																className='text-primary'
-																onClick={() =>
-																	navigate(`/transactions/${transaction.id}`)
-																}>
-																View Details
-															</Button>
+														<TableCell className='relative'>
+															<motion.div
+																whileHover={{ scale: 1.05 }}
+																whileTap={{ scale: 0.95 }}
+																transition={motionConfig.hoverTransition}>
+																<Button
+																	variant='link'
+																	size='sm'
+																	className='text-primary hover:text-primary/80 transition-colors'
+																	onClick={() =>
+																		navigate(`/transactions/${transaction.id}`)
+																	}>
+																	View Details
+																</Button>
+															</motion.div>
 														</TableCell>
-													</TableRow>
+													</motion.tr>
 												);
 											})
 										)}
@@ -433,33 +613,54 @@ export default function Dashboard() {
 												</TableCell>
 											</TableRow>
 										) : (
-											filteredTransactions.map(transaction => {
+											filteredTransactions.map((transaction, index) => {
 												const severity = getSeverityLabel(
 													transaction.riskScore || 0
 												);
+												const isHighSeverity = severity === 'high';
 												return (
-													<TableRow key={transaction.id}>
-														<TableCell className='font-medium'>
+													<motion.tr
+														key={transaction.id}
+														initial={{ opacity: 0, x: -20 }}
+														animate={{ opacity: 1, x: 0 }}
+														transition={{
+															...motionConfig.rowTransition,
+															delay: index * 0.05,
+														}}
+														className={isHighSeverity ? 'relative' : ''}>
+														{isHighSeverity && (
+															<motion.div
+																className='absolute inset-0 bg-red-50 dark:bg-red-950/20'
+																initial={{ opacity: 0 }}
+																animate={{ opacity: [0, 0.3, 0] }}
+																transition={{
+																	duration: 1,
+																	repeat: 1,
+																	delay: index * 0.05 + 0.3,
+																}}
+															/>
+														)}
+														<TableCell className='relative font-medium'>
 															{transaction.id.substring(0, 8)}...
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{transaction.senderAccountNumber}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															₦{transaction.amount.toLocaleString()}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{format(
 																new Date(transaction.createdAt),
 																'MMM dd, yyyy HH:mm'
 															)}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															<span className='font-medium'>
 																{transaction.riskScore || 0}
 															</span>
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															<Badge
 																variant={
 																	severity === 'high'
@@ -476,18 +677,23 @@ export default function Dashboard() {
 																{severity}
 															</Badge>
 														</TableCell>
-														<TableCell>
-															<Button
-																variant='link'
-																size='sm'
-																className='text-primary'
-																onClick={() =>
-																	navigate(`/transactions/${transaction.id}`)
-																}>
-																View Details
-															</Button>
+														<TableCell className='relative'>
+															<motion.div
+																whileHover={{ scale: 1.05 }}
+																whileTap={{ scale: 0.95 }}
+																transition={motionConfig.hoverTransition}>
+																<Button
+																	variant='link'
+																	size='sm'
+																	className='text-primary hover:text-primary/80 transition-colors'
+																	onClick={() =>
+																		navigate(`/transactions/${transaction.id}`)
+																	}>
+																	View Details
+																</Button>
+															</motion.div>
 														</TableCell>
-													</TableRow>
+													</motion.tr>
 												);
 											})
 										)}
@@ -535,33 +741,54 @@ export default function Dashboard() {
 												</TableCell>
 											</TableRow>
 										) : (
-											filteredTransactions.map(transaction => {
+											filteredTransactions.map((transaction, index) => {
 												const severity = getSeverityLabel(
 													transaction.riskScore || 0
 												);
+												const isHighSeverity = severity === 'high';
 												return (
-													<TableRow key={transaction.id}>
-														<TableCell className='font-medium'>
+													<motion.tr
+														key={transaction.id}
+														initial={{ opacity: 0, x: -20 }}
+														animate={{ opacity: 1, x: 0 }}
+														transition={{
+															...motionConfig.rowTransition,
+															delay: index * 0.05,
+														}}
+														className={isHighSeverity ? 'relative' : ''}>
+														{isHighSeverity && (
+															<motion.div
+																className='absolute inset-0 bg-red-50 dark:bg-red-950/20'
+																initial={{ opacity: 0 }}
+																animate={{ opacity: [0, 0.3, 0] }}
+																transition={{
+																	duration: 1,
+																	repeat: 1,
+																	delay: index * 0.05 + 0.3,
+																}}
+															/>
+														)}
+														<TableCell className='relative font-medium'>
 															{transaction.id.substring(0, 8)}...
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{transaction.senderAccountNumber}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															₦{transaction.amount.toLocaleString()}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															{format(
 																new Date(transaction.createdAt),
 																'MMM dd, yyyy HH:mm'
 															)}
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															<span className='font-medium'>
 																{transaction.riskScore || 0}
 															</span>
 														</TableCell>
-														<TableCell>
+														<TableCell className='relative'>
 															<Badge
 																variant={
 																	severity === 'high'
@@ -578,18 +805,23 @@ export default function Dashboard() {
 																{severity}
 															</Badge>
 														</TableCell>
-														<TableCell>
-															<Button
-																variant='link'
-																size='sm'
-																className='text-primary'
-																onClick={() =>
-																	navigate(`/transactions/${transaction.id}`)
-																}>
-																View Details
-															</Button>
+														<TableCell className='relative'>
+															<motion.div
+																whileHover={{ scale: 1.05 }}
+																whileTap={{ scale: 0.95 }}
+																transition={motionConfig.hoverTransition}>
+																<Button
+																	variant='link'
+																	size='sm'
+																	className='text-primary hover:text-primary/80 transition-colors'
+																	onClick={() =>
+																		navigate(`/transactions/${transaction.id}`)
+																	}>
+																	View Details
+																</Button>
+															</motion.div>
 														</TableCell>
-													</TableRow>
+													</motion.tr>
 												);
 											})
 										)}

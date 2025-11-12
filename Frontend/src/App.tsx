@@ -1,6 +1,8 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Alerts from './pages/Alerts';
 import Auth from './pages/Auth';
 import BehavioralAnalytics from './pages/BehavioralAnalytics';
@@ -11,9 +13,6 @@ import NotFound from './pages/NotFound';
 import ProfileSettings from './pages/ProfileSettings';
 import Reports from './pages/Reports';
 import RulesEngine from './pages/RulesEngine';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import TransactionDetails from './pages/TransactionDetails';
 import Transactions from './pages/Transactions';
 import UserManagement from './pages/UserManagement';
@@ -29,11 +28,20 @@ const App = () => (
 				<Routes>
 					<Route
 						path='/'
-						element={<Auth />}
+						element={<Dashboard />}
 					/>
 					<Route
 						path='/dashboard'
-						element={<Dashboard />}
+						element={
+							<Navigate
+								to='/'
+								replace
+							/>
+						}
+					/>
+					<Route
+						path='/auth'
+						element={<Auth />}
 					/>
 					<Route
 						path='/transactions'

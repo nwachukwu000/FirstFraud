@@ -16,25 +16,16 @@ public class AlertService : IAlertService
 
     public async Task<(IEnumerable<Transaction> items, int total)> GetPagedAsync(int page, int pageSize, int? month, AlertSeverity? severity, AlertStatus? status, string? ruleName)
     {
-        // Get all transactions and compute risk scores
-        var transactions = await _db.Transactions.AsNoTracking().ToListAsync();
-        var rules = await _db.Rules.AsNoTracking().Where(r => r.IsEnabled).ToListAsync();
+        // Use stored risk scores; do not recompute based on current rules
+        var transactions = await _db.Transactions.AsNoTracking().Where(t => t.RiskScore > 0).ToListAsync();
         var cases = await _db.Cases.AsNoTracking().ToListAsync();
         
-        // Compute risk scores for all transactions
-        foreach (var tx in transactions)
-        {
-            tx.RiskScore = RuleEngine.ComputeRiskScore(tx, rules);
-            tx.IsFlagged = tx.RiskScore >= 70;
-        }
-
-        // Filter transactions with risk score > 0
-        var q = transactions.Where(t => t.RiskScore > 0).AsQueryable();
+        var q = transactions.AsQueryable();
         
         if (month.HasValue) q = q.Where(t => t.CreatedAt.Month == month.Value);
         if (severity.HasValue)
         {
-            // Map severity to risk score ranges
+            // Map severity to stored risk score ranges
             q = severity.Value switch
             {
                 AlertSeverity.Critical => q.Where(t => t.RiskScore >= 90),
@@ -46,7 +37,7 @@ public class AlertService : IAlertService
         }
         if (status.HasValue)
         {
-            // Materialize the query first to work with in-memory collections
+            // Materialize to work with case status joins
             var transactionList = q.ToList();
             var filtered = status.Value switch
             {

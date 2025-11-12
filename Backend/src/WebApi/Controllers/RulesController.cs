@@ -17,6 +17,8 @@ public class RulesController : BaseController
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(Rule), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] RuleRequest req)
     {
         var rule = new Rule
@@ -42,6 +44,8 @@ public class RulesController : BaseController
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(Rule), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, [FromBody] RuleRequest req)
     {
         var rule = await _db.Rules.FindAsync(id);
@@ -64,6 +68,8 @@ public class RulesController : BaseController
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var rule = await _db.Rules.FindAsync(id);
@@ -77,6 +83,7 @@ public class RulesController : BaseController
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<Rule>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList()
     {
         var rules = await _db.Rules.OrderByDescending(r => r.CreatedAt).ToListAsync();
@@ -84,6 +91,8 @@ public class RulesController : BaseController
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(Rule), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var rule = await _db.Rules.FindAsync(id);
@@ -92,6 +101,8 @@ public class RulesController : BaseController
 
     [HttpPut("{id:guid}/toggle")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ToggleStatus(Guid id)
     {
         var rule = await _db.Rules.FindAsync(id);
