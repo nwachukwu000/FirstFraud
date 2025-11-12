@@ -30,13 +30,13 @@ const App = () => (
 				<Routes>
 					{/* Public routes */}
 					<Route
-						path='/auth'
+						path='/'
 						element={<Auth />}
 					/>
 
 					{/* Protected routes - All authenticated users */}
 					<Route
-						path='/'
+						path='/dashboard'
 						element={
 							<ProtectedRoute
 								allowedRoles={['Admin', 'Analyst', 'Investigator', 'Viewer']}>
@@ -45,7 +45,7 @@ const App = () => (
 						}
 					/>
 					<Route
-						path='/dashboard'
+						path='/'
 						element={
 							<Navigate
 								to='/'
