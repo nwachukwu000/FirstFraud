@@ -30,6 +30,18 @@ import { format } from "date-fns";
 import { isAxiosError } from "axios";
 import { DateRange } from "react-day-picker";
 
+const getInitials = (value: string) => {
+  if (!value) {
+    return "AN";
+  }
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return value.substring(0, 2).toUpperCase();
+  }
+  const initials = parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "");
+  return initials.join("") || value.substring(0, 2).toUpperCase();
+};
+
 export default function Cases() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -108,6 +120,23 @@ export default function Cases() {
   const allCases = data?.items || [];
   const users = usersData?.items || [];
 
+  const analystLookup = useMemo(() => {
+    const map = new Map<string, User>();
+    users.forEach((user: User) => {
+      if (user?.id) {
+        map.set(user.id, user);
+      }
+    });
+    if (analystsData?.items) {
+      analystsData.items.forEach((analyst: User) => {
+        if (analyst?.id) {
+          map.set(analyst.id, analyst);
+        }
+      });
+    }
+    return map;
+  }, [users, analystsData]);
+
   // Get assignees - show all analysts/investigators, plus any users assigned to cases
   const assignees = useMemo(() => {
     // Get all analysts and investigators from users
@@ -139,6 +168,33 @@ export default function Cases() {
       name: user.fullName || user.email || user.id.substring(0, 8),
     }));
   }, [users, allCases]);
+
+  const renderAssignee = (caseItem: Case) => {
+    if (!caseItem.investigatorId) {
+      return <span className="text-xs text-muted-foreground">Unassigned</span>;
+    }
+
+    const analyst = analystLookup.get(caseItem.investigatorId);
+    const displayName =
+      analyst?.fullName?.trim() ||
+      analyst?.email?.trim() ||
+      `Analyst ${caseItem.investigatorId.substring(0, 8)}`;
+    const initialsSource =
+      analyst?.fullName?.trim() ||
+      analyst?.email?.trim() ||
+      caseItem.investigatorId;
+
+    return (
+      <div className="flex items-center gap-2">
+        <Avatar className="h-6 w-6">
+          <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
+            {getInitials(initialsSource)}
+          </AvatarFallback>
+        </Avatar>
+        <span className="text-xs text-muted-foreground">{displayName}</span>
+      </div>
+    );
+  };
 
   // Apply filters to cases
   const cases = useMemo(() => {
@@ -695,15 +751,7 @@ export default function Cases() {
                           </div>
                           <p className="text-sm text-muted-foreground">{caseItem.title}</p>
                           <div className="flex items-center justify-between pt-2">
-                            {caseItem.investigatorId ? (
-                              <Avatar className="h-6 w-6">
-                                <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
-                                  {caseItem.investigatorId.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">Unassigned</span>
-                            )}
+                            {renderAssignee(caseItem)}
                             <div className="flex gap-2">
                               <Button
                                 variant="outline"
@@ -764,15 +812,7 @@ export default function Cases() {
                           </div>
                           <p className="text-sm text-muted-foreground">{caseItem.title}</p>
                           <div className="flex items-center justify-between pt-2">
-                            {caseItem.investigatorId ? (
-                              <Avatar className="h-6 w-6">
-                                <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
-                                  {caseItem.investigatorId.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">Unassigned</span>
-                            )}
+                            {renderAssignee(caseItem)}
                             <span className="text-xs text-muted-foreground">
                               {caseItem.updatedAt
                                 ? format(new Date(caseItem.updatedAt), "MMM dd, yyyy")

@@ -1,9 +1,12 @@
+using FDMA.Application.Interfaces;
 using FDMA.Domain.Entities;
 using FDMA.Domain.Enums;
 using FDMA.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace FDMA.WebApi.Controllers;
 
@@ -13,7 +16,15 @@ namespace FDMA.WebApi.Controllers;
 public class CasesController : BaseController
 {
     private readonly AppDbContext _db;
-    public CasesController(AppDbContext db) => _db = db;
+    private readonly IEmailService _emailService;
+    private readonly UserManager<User> _userManager;
+
+    public CasesController(AppDbContext db, IEmailService emailService, UserManager<User> userManager)
+    {
+        _db = db;
+        _emailService = emailService;
+        _userManager = userManager;
+    }
 
     [HttpPost]
     [Authorize(Roles = "Admin,Analyst")]
@@ -31,6 +42,8 @@ public class CasesController : BaseController
         if (riskScore <= 0)
             return BadRequest(new { message = "Cannot create case for transaction with risk score 0 or below" });
 
+        transaction.RiskScore = riskScore;
+
         var caseEntity = new Case
         {
             Id = Guid.NewGuid(),
@@ -47,6 +60,22 @@ public class CasesController : BaseController
         CreateAuditLog(_db, "Case Created", "Case", caseEntity.Id, 
             $"Title: {req.Title}, Transaction: {req.TransactionId}");
         await _db.SaveChangesAsync();
+
+        if (caseEntity.InvestigatorId.HasValue)
+        {
+            var analyst = await _userManager.FindByIdAsync(caseEntity.InvestigatorId.Value.ToString());
+            if (analyst is not null)
+            {
+                User? assignedBy = null;
+                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!string.IsNullOrWhiteSpace(userIdClaim) && Guid.TryParse(userIdClaim, out var assignedById))
+                {
+                    assignedBy = await _userManager.FindByIdAsync(assignedById.ToString());
+                }
+
+                await _emailService.SendCaseAssignmentEmailAsync(caseEntity, analyst, transaction, assignedBy);
+            }
+        }
         
         return CreatedAtAction(nameof(GetById), new { id = caseEntity.Id }, CaseResponse.FromEntity(caseEntity));
     }
