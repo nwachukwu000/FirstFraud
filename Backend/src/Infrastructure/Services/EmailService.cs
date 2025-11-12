@@ -55,7 +55,7 @@ public class EmailService : IEmailService
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(fromName, fromEmail));
-            
+
             // Add all admin users as recipients
             foreach (var admin in adminUsers)
             {
@@ -262,7 +262,7 @@ public class EmailService : IEmailService
                     <span class=""label"">Assigned On</span>
                     <span>{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</span>
                 </div>
-                <a class=""cta"" href=""{_configuration["AppSettings:CaseDetailUrl"] ?? "#"}"">Review Case</a>
+                <a class=""cta"" href=""http:localhost:8080"">Review Case</a>
             </div>
             <div class=""footer"">
                 <p>You are receiving this email because you are listed as an analyst in the Fraud Detection Management Application.</p>

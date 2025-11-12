@@ -271,7 +271,7 @@ export function AppSidebar() {
 							onClick={() => {
 								localStorage.removeItem('token');
 								localStorage.removeItem('user');
-								navigate('/auth');
+								navigate('/');
 							}}>
 							<LogOut className='w-4 h-4' />
 							<span>Logout</span>
