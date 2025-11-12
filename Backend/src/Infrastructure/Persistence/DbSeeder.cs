@@ -20,24 +20,24 @@ public static class DbSeeder
         if (!await db.Rules.AnyAsync())
         {
             db.Rules.AddRange(
-                new Rule 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "High Amount Transaction", 
-                    Field = "Amount", 
-                    Condition = "GreaterThan", 
-                    Value = "200000", 
+                new Rule
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "High Amount Transaction",
+                    Field = "Amount",
+                    Condition = "GreaterThan",
+                    Value = "200000",
                     IsEnabled = true,
                     Severity = Domain.Enums.AlertSeverity.High,
                     SeverityWeight = 40
                 },
-                new Rule 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "New Device + Large Transfer", 
-                    Field = "Device", 
-                    Condition = "Equals", 
-                    Value = "NewDevice", 
+                new Rule
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "New Device + Large Transfer",
+                    Field = "Device",
+                    Condition = "Equals",
+                    Value = "NewDevice",
                     IsEnabled = false,
                     Severity = Domain.Enums.AlertSeverity.Medium,
                     SeverityWeight = 25
@@ -46,7 +46,7 @@ public static class DbSeeder
         }
         if (!await db.Transactions.AnyAsync())
         {
-            for (int i=0;i<20;i++)
+            for (int i = 0; i < 20; i++)
             {
                 db.Transactions.Add(new Transaction
                 {
@@ -54,10 +54,10 @@ public static class DbSeeder
                     SenderAccountNumber = $"000{i:0000000000}",
                     ReceiverAccountNumber = $"111{i:0000000000}",
                     TransactionType = "Transfer",
-                    CreatedAt = DateTime.UtcNow.AddMinutes(-i*5),
-                    Amount = 100000 + i*50000,
-                    Device = i%3==0 ? "NewDevice" : "iOS",
-                    Location = i%2==0 ? "NG-LAGOS" : "NG-ABUJA",
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-i * 5),
+                    Amount = 100000 + i * 50000,
+                    Device = i % 3 == 0 ? "NewDevice" : "iOS",
+                    Location = i % 2 == 0 ? "NG-LAGOS" : "NG-ABUJA",
                     IpAddress = $"192.168.1.{100 + i}",
                     Status = "Completed",
                     RiskScore = 0
@@ -68,7 +68,7 @@ public static class DbSeeder
         // Seed default admin user if it doesn't exist
         var adminEmail = "admin@fraudguard.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        
+
         if (adminUser == null)
         {
             adminUser = new User
