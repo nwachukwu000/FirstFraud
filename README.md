@@ -76,7 +76,7 @@ FraudGuard is a full-stack fraud detection system designed to help financial ins
 - **JWT Bearer Authentication**: Token-based security
 - **MailKit**: Email service integration
 - **NLog**: Logging framework
-- **AutoMapper**: Object mapping (if used)
+- **AutoMapper**: Object mapping
 
 ### Frontend
 
