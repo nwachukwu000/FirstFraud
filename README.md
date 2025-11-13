@@ -286,7 +286,7 @@ The system uses the following main entities:
 - **Users**: System users with roles (Admin, Analyst, Investigator, Viewer)
 - **Transactions**: Financial transactions being monitored
 - **Alerts**: Flagged transactions with risk scores
-- **Cases**: Investigation cases created from alerts
+- **Cases**: Investigation cases created from alerts, this is were the cases created get resolved
 - **Rules**: Fraud detection rules
 - **Comments**: Comments on cases
 - **Notifications**: System notifications
