@@ -1,6 +1,6 @@
 # FraudGuard - Fraud Detection & Management System
 
-A comprehensive fraud detection and management system built with ASP.NET Core Web API backend and React TypeScript frontend. The system provides real-time transaction monitoring, automated fraud detection using configurable rules, case management, and comprehensive analytics.
+A comprehensive fraud detection and management system built with ASP.NET Core Web API backend and React TypeScript frontend. The system provides near real-time transaction monitoring, automated fraud detection using configurable rules, case management, and comprehensive analytics.
 
 ## Table of Contents
 
@@ -11,17 +11,11 @@ A comprehensive fraud detection and management system built with ASP.NET Core We
 - [Prerequisites](#prerequisites)
 - [Installation & Setup](#installation--setup)
 - [Configuration](#configuration)
-- [Database Setup](#database-setup)
-- [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Frontend Features](#frontend-features)
 - [Backend Features](#backend-features)
-- [Authentication & Authorization](#authentication--authorization)
-- [Rule Engine](#rule-engine)
-- [Email Notifications](#email-notifications)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
-- [Deployment](#deployment)
 - [Contributing](#contributing)
 
 ## Overview
@@ -83,16 +77,7 @@ FraudGuard is a full-stack fraud detection system designed to help financial ins
 - **React 18**: UI library
 - **TypeScript**: Type-safe JavaScript
 - **Vite**: Build tool and dev server
-- **React Router**: Client-side routing
-- **TanStack Query (React Query)**: Data fetching and caching
-- **Axios**: HTTP client
-- **Tailwind CSS**: Utility-first CSS framework
-- **shadcn/ui**: High-quality React components
-- **Framer Motion**: Animation library
-- **React CountUp**: Animated number counters
-- **Recharts**: Chart library
-- **Lucide React**: Icon library
-- **date-fns**: Date utility library
+
 
 ## Architecture
 
@@ -140,7 +125,7 @@ Before you begin, ensure you have the following installed:
 - **Node.js** 18.x or later
 - **PostgreSQL** 12.x or later
 - **Git** for version control
-- **Visual Studio 2022** or **VS Code** (recommended)
+- **Visual Studio 2022** or **VS Code**
 - **Postman** or similar API testing tool (optional)
 
 ## Installation & Setup
@@ -180,20 +165,6 @@ Edit `appsettings.json` and update the connection string:
 }
 ```
 
-#### Create Database
-
-The application will automatically create the database on first run. Alternatively, you can use the provided scripts:
-
-**PowerShell Script:**
-```powershell
-.\scripts\CreateDatabase.ps1
-```
-
-**SQL Script:**
-```bash
-psql -U postgres -f scripts\CreateDatabase.sql
-```
-
 **C# Script:**
 ```bash
 dotnet run --project scripts\CreateDatabase.cs
@@ -219,14 +190,6 @@ cd Frontend
 
 ```bash
 npm install
-```
-
-#### Configure API URL
-
-Create a `.env` file in the Frontend directory (optional, defaults to `http://localhost:5000/api`):
-
-```env
-VITE_API_URL=http://localhost:5000/api
 ```
 
 ## Configuration
@@ -265,60 +228,6 @@ VITE_API_URL=http://localhost:5000/api
 }
 ```
 
-### Email Configuration
-
-For Gmail, you'll need to:
-1. Enable 2-Factor Authentication
-2. Generate an App Password
-3. Use the App Password in `SmtpPassword`
-
-### JWT Configuration
-
-- **SecretKey**: Must be at least 32 characters long
-- **ExpirationMinutes**: Token expiration time (1440 = 24 hours)
-
-## Database Setup
-
-### Database Schema
-
-The system uses the following main entities:
-
-- **Users**: System users with roles (Admin, Analyst, Investigator, Viewer)
-- **Transactions**: Financial transactions being monitored
-- **Alerts**: Flagged transactions with risk scores
-- **Cases**: Investigation cases created from alerts, this is were the cases created get resolved
-- **Rules**: Fraud detection rules
-- **Comments**: Comments on cases
-- **Notifications**: System notifications
-- **AuditLogs**: Audit trail of system changes
-
-### Initial Data Seeding
-
-The application automatically seeds:
-- Default admin user (if not exists)
-- Default fraud detection rules (if not exists)
-- Sample transactions (if `Seed:SampleTransactions` is `true`)
-
-**Default Admin Credentials:**
-- Email: `admin@fraudguard.com`
-- Password: `Admin123!`
-
-**⚠️ Important**: Change the default admin password in production!
-
-## Running the Application
-
-### Backend
-
-```bash
-cd Backend/src/WebApi
-dotnet run
-```
-
-The API will be available at:
-- HTTP: `http://localhost:5000`
-- HTTPS: `https://localhost:5001`
-- Swagger UI: `https://localhost:5001/swagger`
-
 ### Frontend
 
 ```bash
@@ -329,7 +238,7 @@ npm run dev
 The frontend will be available at:
 - `http://localhost:8080`
 
-### Transaction Simulator (Optional)
+### Transaction Simulator 
 
 To simulate transactions for testing:
 
@@ -376,297 +285,6 @@ Content-Type: application/json
   "role": "Analyst"
 }
 ```
-
-### Transaction Endpoints
-
-#### Get Transactions (Paginated)
-```
-GET /api/transactions?page=1&pageSize=20&status=Flagged&minRisk=50
-Authorization: Bearer {token}
-```
-
-#### Get Transaction Details
-```
-GET /api/transactions/{id}
-Authorization: Bearer {token}
-```
-
-#### Create Transaction
-```
-POST /api/transactions
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-  "senderAccountNumber": "1234567890",
-  "receiverAccountNumber": "0987654321",
-  "amount": 50000,
-  "transactionType": "Transfer",
-  "location": "Lagos, Nigeria",
-  "device": "Mobile",
-  "ipAddress": "192.168.1.1"
-}
-```
-
-### Alert Endpoints
-
-#### Get Alerts
-```
-GET /api/alerts?page=1&pageSize=20&severity=2&status=0
-Authorization: Bearer {token}
-```
-
-#### Resolve Alert
-```
-POST /api/alerts/{id}/resolve
-Authorization: Bearer {token}
-```
-
-### Case Endpoints
-
-#### Get Cases
-```
-GET /api/cases?page=1&pageSize=20
-Authorization: Bearer {token}
-```
-
-#### Create Case
-```
-POST /api/cases
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-  "title": "Suspicious Transaction Case",
-  "description": "Large transfer to unknown account",
-  "transactionId": "...",
-  "investigatorId": "..."
-}
-```
-
-### Rules Endpoints
-
-#### Get Rules
-```
-GET /api/rules
-Authorization: Bearer {token}
-```
-
-#### Create Rule
-```
-POST /api/rules
-Content-Type: application/json
-Authorization: Bearer {token} (Admin only)
-
-{
-  "name": "High Amount Transaction",
-  "field": "Amount",
-  "condition": "GreaterThan",
-  "value": "200000",
-  "isEnabled": true,
-  "severity": 2,
-  "severityWeight": 40
-}
-```
-
-## Frontend Features
-
-### Dashboard
-
-The dashboard provides a comprehensive overview:
-- **Total Transactions**: Animated counter showing total transaction volume
-- **Flagged Alerts**: Count of transactions flagged as suspicious
-- **Resolved Cases**: Number of cases successfully resolved
-- **Pending Cases**: Cases currently under investigation
-- **Recent Transactions Table**: Latest transactions with severity indicators
-- **Time Range Filter**: View data for last 24 hours, 7 days, or 30 days
-
-### Transaction Monitoring
-
-- View all transactions with pagination
-- Filter by status (All, Flagged, Resolved)
-- Search by transaction ID or account number
-- View detailed transaction information
-- See triggered rules and risk scores
-- View customer information
-
-### Alerts Management
-
-- View all flagged transactions
-- Filter by severity (Low, Medium, High, Critical)
-- Filter by status (Pending, Under Review, Escalated, Resolved)
-- Create cases from alerts
-- Export alerts to CSV
-
-### Case Management
-
-- Create cases from flagged transactions
-- Assign cases to investigators
-- Add comments (internal and external)
-- Track case status (New, Investigating, Resolved)
-- View case history and audit logs
-- Filter and search cases
-
-### Reports & Analytics
-
-- **Total Alerts**: Count of alerts in selected time period
-- **Resolution Rate**: Percentage of cases resolved
-- **Average Resolution Time**: Average days to resolve cases
-- **High-Risk Accounts**: Accounts with multiple flagged transactions
-- **Monthly Trends Chart**: Visual representation of alerts over time
-- **Severity Distribution**: Pie chart showing alert distribution by severity
-
-### Rules Engine
-
-- Create custom fraud detection rules
-- Configure rule conditions (GreaterThan, Equals, In, NotIn)
-- Set severity levels (Low, Medium, High, Critical)
-- Set severity weights (0-100%) for risk score calculation
-- Enable/disable rules (only affects future transactions)
-- View rule details and usage
-
-### User Management
-
-- View all system users
-- Create new users with roles
-- Edit user information
-- Manage user roles (Admin, Analyst, Investigator, Viewer)
-- View user activity
-
-## Backend Features
-
-### Rule Engine
-
-The rule engine evaluates transactions against configured rules:
-
-1. **Rule Evaluation**: Each enabled rule is checked against the transaction
-2. **Risk Score Calculation**: Risk score is calculated by summing severity weights of matched rules
-3. **Normalization**: If total exceeds 100, scores are normalized proportionally
-4. **Alert Creation**: Alerts are created for transactions with risk score > 0
-5. **Email Notification**: Administrators receive email notifications for flagged transactions
-
-**Rule Conditions:**
-- `GreaterThan`: Numeric comparison (e.g., Amount > 200000)
-- `Equals`: Exact match (e.g., Device = "NewDevice")
-- `In`: Value in comma-separated list (e.g., Location in "Lagos,Abuja")
-- `NotIn`: Value not in comma-separated list
-
-**Severity Levels:**
-- `Low` (0): Risk score 0-39
-- `Medium` (1): Risk score 40-69
-- `High` (2): Risk score 70-89
-- `Critical` (3): Risk score 90-100
-
-### Email Notifications
-
-When a transaction is flagged:
-1. Alert is created with severity based on risk score
-2. Email is sent to all admin users
-3. Email includes:
-   - Transaction details
-   - Risk score
-   - Severity level
-   - Triggered rules
-   - Direct link to transaction details
-
-### Global Error Handling
-
-The application uses `ErrorHandlingMiddleware` to:
-- Catch all unhandled exceptions
-- Log errors with NLog
-- Return consistent JSON error responses
-- Include correlation IDs for tracking
-
-### Audit Logging
-
-All system changes are logged:
-- User actions (create, update, delete)
-- Rule changes
-- Case status changes
-- User management actions
-
-## Authentication & Authorization
-
-### Authentication Flow
-
-1. User submits credentials via `/api/auths/login`
-2. Backend validates credentials
-3. JWT token is generated and returned
-4. Frontend stores token in localStorage
-5. Token is included in all subsequent API requests
-6. Backend validates token on each request
-
-### Authorization Roles
-
-- **Admin**: Full system access, can manage users and rules
-- **Analyst**: Can view transactions, alerts, and cases; can create cases
-- **Investigator**: Can view and manage assigned cases
-- **Viewer**: Read-only access to transactions and alerts
-
-### Protected Routes
-
-All API endpoints except `/api/auths/login` and `/api/auths/register` require authentication. Admin-only endpoints are protected with `[Authorize(Roles = "Admin")]`.
-
-## Rule Engine
-
-### How Rules Work
-
-1. **Transaction Creation**: When a transaction is created, all enabled rules are evaluated
-2. **Rule Matching**: Each rule checks if the transaction matches its criteria
-3. **Weight Calculation**: Matched rules contribute their severity weight to the risk score
-4. **Score Normalization**: If total weight exceeds 100, scores are normalized
-5. **Alert Generation**: Transactions with risk score > 0 are flagged
-6. **Historical Immutability**: Rule changes only affect future transactions
-
-### Example Rule
-
-```json
-{
-  "name": "High Amount Transaction",
-  "field": "Amount",
-  "condition": "GreaterThan",
-  "value": "200000",
-  "isEnabled": true,
-  "severity": 2,
-  "severityWeight": 40
-}
-```
-
-This rule flags transactions over ₦200,000 and adds 40 points to the risk score.
-
-### Risk Score Calculation
-
-```
-Risk Score = Sum of all matched rule weights
-If Risk Score > 100 and Max Possible Score > 100:
-    Risk Score = (Risk Score / Max Possible Score) * 100
-```
-
-## Email Notifications
-
-### Configuration
-
-Email notifications are configured in `appsettings.json`:
-
-```json
-"EmailSettings": {
-  "SmtpHost": "smtp.gmail.com",
-  "SmtpPort": "587",
-  "SmtpUsername": "your-email@gmail.com",
-  "SmtpPassword": "your-app-password",
-  "FromEmail": "your-email@gmail.com",
-  "FromName": "Fraud Detection System"
-}
-```
-
-### Email Content
-
-Emails include:
-- Transaction ID and details
-- Risk score and severity
-- Triggered rules
-- Transaction amount and accounts
-- Timestamp
 
 ## Project Structure
 
@@ -715,58 +333,6 @@ cd Backend/tests/UnitTests
 dotnet test
 ```
 
-### Frontend Tests
-
-```bash
-cd Frontend
-npm test
-```
-
-### Manual Testing
-
-1. Use the Transaction Simulator to create test transactions
-2. Verify rules are triggered correctly
-3. Check email notifications are sent
-4. Test case creation and management
-5. Verify user permissions
-
-## Deployment
-
-### Backend Deployment
-
-1. Build the application:
-```bash
-dotnet publish -c Release -o ./publish
-```
-
-2. Configure production settings in `appsettings.Production.json`
-
-3. Set environment variables:
-- `ConnectionStrings__DefaultConnection`
-- `JwtSettings__SecretKey`
-- `EmailSettings__SmtpPassword`
-
-4. Deploy to your hosting platform (Azure, AWS, etc.)
-
-### Frontend Deployment
-
-1. Build for production:
-```bash
-npm run build
-```
-
-2. The `dist` folder contains the production build
-
-3. Deploy to a static hosting service (Vercel, Netlify, etc.)
-
-4. Configure environment variables for API URL
-
-### Database Migration in Production
-
-```bash
-dotnet ef database update --project ../Infrastructure/Infrastructure.csproj --startup-project WebApi.csproj --context FDMA.Infrastructure.Persistence.AppDbContext
-```
-
 ## Contributing
 
 1. Fork the repository
@@ -793,10 +359,4 @@ For issues, questions, or contributions, please contact the development team or 
 
 ---
 
-**Note**: This is a comprehensive fraud detection system. Ensure proper security measures are in place before deploying to production, including:
-- Strong JWT secret keys
-- Secure database credentials
-- HTTPS/TLS encryption
-- Regular security audits
-- Backup and disaster recovery plans
 
